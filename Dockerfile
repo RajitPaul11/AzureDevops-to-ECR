@@ -1,10 +1,21 @@
-FROM centos:8
-RUN yum install java-11-openjdk-devel -y
-RUN yum install maven -y
-CMD echo "export JAVA_HOME=/usr/lib/jvm/jre-openjdk" > /etc/profile.d/maven.sh
-CMD echo "export M2_HOME=/opt/maven" >> /etc/profile.d/maven.sh
-CMD echo "export MAVEN_HOME=/opt/maven" >> /etc/profile.d/maven.sh
-CMD echo "PATH=${M2_HOME}/bin:${PATH}" >> /etc/profile.d/maven.sh
-CMD chmod +x /etc/profile.d/maven.sh
-CMD source /etc/profile.d/maven.sh
-CMD /bin/bash
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base  
+WORKDIR /app  
+EXPOSE 80  
+EXPOSE 443  
+  
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build  
+WORKDIR /src  
+COPY . TrainingService/  
+RUN dotnet restore "TrainingService/TrainingService.csproj"  
+COPY . .  
+WORKDIR "/src/TrainingService"  
+RUN dotnet build "TrainingService.csproj" -c Release -o /app/build  
+  
+FROM build AS publish  
+RUN dotnet publish "TrainingService.csproj" -c Release -o /app/publish  
+  
+FROM base AS final  
+WORKDIR /app  
+COPY ./Resource/Trainingdata.xml /app  
+COPY --from=publish /app/publish .  
+ENTRYPOINT ["dotnet", "TrainingService.dll"]
