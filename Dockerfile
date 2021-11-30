@@ -1,16 +1,10 @@
-# Sample Dockerfile
-
-# Indicates that the windowsservercore image will be used as the base image.
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
-
-# Metadata indicating an image maintainer.
-LABEL maintainer="jshelton@contoso.com"
-
-# Uses dism.exe to install the IIS role.
-RUN dism.exe /online /enable-feature /all /featurename:iis-webserver /NoRestart
-
-# Creates an HTML file and adds content to this file.
-RUN echo "Hello World - Dockerfile" > c:\inetpub\wwwroot\index.html
-
-# Sets a command or process that will run each time a container is run from the new image.
-CMD [ "cmd" ]
+FROM centos:8
+RUN yum install java-11-openjdk-devel -y
+RUN yum install maven -y
+CMD echo "export JAVA_HOME=/usr/lib/jvm/jre-openjdk" > /etc/profile.d/maven.sh
+CMD echo "export M2_HOME=/opt/maven" >> /etc/profile.d/maven.sh
+CMD echo "export MAVEN_HOME=/opt/maven" >> /etc/profile.d/maven.sh
+CMD echo "PATH=${M2_HOME}/bin:${PATH}" >> /etc/profile.d/maven.sh
+CMD chmod +x /etc/profile.d/maven.sh
+CMD source /etc/profile.d/maven.sh
+CMD /bin/bash
