@@ -1,21 +1,16 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base  
-WORKDIR /app  
-EXPOSE 80  
-EXPOSE 443  
-  
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build  
-WORKDIR /src  
-COPY . TrainingService/  
-RUN dotnet restore "TrainingService/TrainingService.csproj"  
-COPY . .  
-WORKDIR "/src/TrainingService"  
-RUN dotnet build "TrainingService.csproj" -c Release -o /app/build  
-  
-FROM build AS publish  
-RUN dotnet publish "TrainingService.csproj" -c Release -o /app/publish  
-  
-FROM base AS final  
-WORKDIR /app  
-COPY ./Resource/Trainingdata.xml /app  
-COPY --from=publish /app/publish .  
-ENTRYPOINT ["dotnet", "TrainingService.dll"]
+# Sample Dockerfile
+
+# Indicates that the windowsservercore image will be used as the base image.
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+# Metadata indicating an image maintainer.
+LABEL maintainer="jshelton@contoso.com"
+
+# Uses dism.exe to install the IIS role.
+RUN dism.exe /online /enable-feature /all /featurename:iis-webserver /NoRestart
+
+# Creates an HTML file and adds content to this file.
+RUN echo "Hello World - Dockerfile" > c:\inetpub\wwwroot\index.html
+
+# Sets a command or process that will run each time a container is run from the new image.
+CMD [ "cmd" ]
