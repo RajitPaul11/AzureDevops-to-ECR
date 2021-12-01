@@ -1,6 +1,6 @@
 FROM centos:8
 
-LABEL "maintainer: rajitpaull@gmail.com"
+LABEL "maintainer"="rajitpaull@gmail.com"
 
 RUN yum install java-11-openjdk-devel -y
 RUN yum install maven -y
