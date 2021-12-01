@@ -1,1 +1,1 @@
-# AzureDevops-to-ECR
+# AzureDevops-to-AmazonECR
